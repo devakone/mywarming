@@ -25,7 +25,7 @@
 /**
  * Application Controller
  *
- * Added components here shared by all controllers in the app, they
+ * Add your application-wide methods in the class below, your controllers
  * will inherit them.
  *
  * @package       cake
