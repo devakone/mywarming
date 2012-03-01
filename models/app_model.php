@@ -1,10 +1,9 @@
 <?php
-
 /**
- * Application level Controller
+ * Application model for Cake.
  *
- * This file is application-wide controller file. You can put all
- * application-wide controller-related methods here.
+ * This file is application-wide model file. You can put all
+ * application-wide model-related methods here.
  *
  * PHP versions 4 and 5
  *
@@ -23,21 +22,13 @@
  */
 
 /**
- * Application Controller
+ * Application model for Cake.
  *
- * Added components here shared by all controllers in the app, they
+ * Add your application-wide methods in the class below, your models
  * will inherit them.
  *
  * @package       cake
  * @subpackage    cake.app
  */
-class AppController extends Controller 
-{
-	var $components = array('Session','Email', 'RequestHandler'
-	);
-	var $helpers = array('Html', 'Form', 'Session','Js' => array('Jquery'));
-
-
-	
-	
+class AppModel extends Model {
 }

@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Application level Controller
+ * User Controller
  *
  * This file is application-wide controller file. You can put all
  * application-wide controller-related methods here.
@@ -23,21 +22,13 @@
  */
 
 /**
- * Application Controller
+ * User Controller
  *
- * Added components here shared by all controllers in the app, they
- * will inherit them.
  *
  * @package       cake
  * @subpackage    cake.app
  */
-class AppController extends Controller 
+class UsersController extends Controller 
 {
-	var $components = array('Session','Email', 'RequestHandler'
-	);
-	var $helpers = array('Html', 'Form', 'Session','Js' => array('Jquery'));
-
-
-	
 	
 }

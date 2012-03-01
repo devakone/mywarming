@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Application level Controller
  *
@@ -25,19 +24,11 @@
 /**
  * Application Controller
  *
- * Added components here shared by all controllers in the app, they
+ * Add your application-wide methods in the class below, your controllers
  * will inherit them.
  *
  * @package       cake
  * @subpackage    cake.app
  */
-class AppController extends Controller 
-{
-	var $components = array('Session','Email', 'RequestHandler'
-	);
-	var $helpers = array('Html', 'Form', 'Session','Js' => array('Jquery'));
-
-
-	
-	
+class AppController extends Controller {
 }
