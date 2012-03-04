@@ -31,11 +31,33 @@
 class GeolocationsController extends AppController 
 {
 	var $name = 'Geolocations';
+	var $components = array("RequestHandler");
+	var $userIP = "";
+	var $userCity = "";
+	var $userGeolocation = array();
+	var $userIplocation = array();
 	
+	function beforeFilter()
+	{
+		parent::beforeFilter();
+		$ipInfoDbApiInfo = Configure::read("IPInfoDb");
+		if(empty($this->currentClientIP))
+		{
+			$this->userIP = $this->RequestHandler->getClientIP();
+		}
+	}
 	
 	function index()
 	{
-		$dakarGeo = $this->Geolocation->find('all');
-		$this->set('user', $dakarGeo);
+		//if no user geoLocation retrieve it
+		$this->userIP = "173.66.97.113";
+		//debug($this->userIP);
+		if(empty($this->userGeolocation))
+		{
+			$conditions= array('ip' => $this->userIP);
+			$this->userGeolocation = $this->Geolocation->find('all', compact("conditions"));
+		}
+		
+		$this->set('userInfo', $this->userGeolocation);
 	}
 }

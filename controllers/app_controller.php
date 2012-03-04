@@ -31,4 +31,7 @@
  * @subpackage    cake.app
  */
 class AppController extends Controller {
+	
+	var $components = array('Session','Email','DebugKit.Toolbar');
+	var $helpers = array('Html', 'Form', 'Session','Js' => array('Jquery'));
 }

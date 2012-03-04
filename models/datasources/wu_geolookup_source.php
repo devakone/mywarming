@@ -1,8 +1,8 @@
 <?php
     /**
-     * Twitter DataSource
+     * Weather Underground DataSource
      *
-     * Used for reading and writing to Twitter, through models.
+     * Used for reading Weather Underground temperature information, through models.
      *
      * PHP Version 5.x
      *
@@ -179,7 +179,7 @@ class WuGeolookupSource extends DataSource
 	{
     	$auth = "{$config['api_key']}";
     	$feature = "{$config['feature']}";
-    	$this->apiUrl =  "http://api.wunderground.com/api/{$auth}/$feature/";
+    	$this->apiUrl =  "http://api.wunderground.com/api/{$auth}";
     	$this->connection = new HttpSocket();
     	parent::__construct($config);
     }
@@ -194,16 +194,22 @@ class WuGeolookupSource extends DataSource
     
     public function read($model, $queryData = array()) 
     {
-    	if (!isset($queryData['conditions']['location'])) 
+    	if (!isset($queryData['conditions']['ip'])) 
     	{
-    		$queryData['conditions']['location'] = "Dakar";
+    		$queryData['conditions']['ip'] = "74.125.45.100";
     	}
     	$query = "/q/";
-    	$query .= "{$queryData['conditions']['location']}.json";
+    	if(isset($queryData['conditions']['ip']) && !empty($queryData['conditions']['ip']))
+    	{
+    		$this->apiUrl .= "/geolookup/conditions";
+    		$query = "/q/autoip.json?geo_ip=" . $queryData['conditions']['ip'];
+    	}
+    	//debug($this->apiUrl . $query);
     	$response = json_decode($this->connection->get($this->apiUrl . $query), true);
     	//debug($response);
     	$record = array('Geolocation' => $response['location']);
     	$record['stations'] = $response['location']['nearby_weather_stations'];
+    	$record['current_observation'] = $response['current_observation'];
     	unset($record['Geolocation']['nearby_weather_stations'] );
     	$record['response'] = $response['response'];
     
