@@ -1,539 +1,437 @@
-<div class="geolocations index">
-	<h2><?php __('Geolocations');?></h2>
-	<article>
-	   
-	    <address>
-	        <h3>Your current location is <?php echo $userInfo['Geolocation']['city']  ?>, <?php echo $userInfo['Geolocation']['country_name']  ?> </h3>
-	    </address>
-	    <figure>
-	        <img src="<?php echo $userInfo['current_observation']['image']['url'] ?>"/>
-	    </figure>
-        <h4>Current Temperature: <?php echo $userInfo['current_observation']['temperature_string']?>  <?php echo $userInfo['current_observation']['observation_time']?></h4>
-	        
-	    
-	    
-	</article>
+<div  class="geolocations index">
+	<h2><?php __('Temperature Dashboard');?></h2>
+	
+	<div id="appCanvas" class="tabbable">
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#1" data-toggle="tab">Current Location</a></li>
+            <li><a href="#2" data-toggle="tab">Favorite Locations</a></li>
+             <li><a href="#3" data-toggle="tab">Friends G-Warming Info</a></li>
+              <li><a href="#4" data-toggle="tab">Take Action</a></li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="1">
+                <div class="span3">
+                    <article>
+                        <address>
+                            <h1><?php echo $user_geolocation['Geolocation']['city']  ?> </h1>
+                            <h2><?php echo $user_geolocation['Geolocation']['country_name']  ?></h2>
+                        </address>
+                        <figure>
+                            <img src="<?php echo $user_geolocation['current_observation']['image']['url'] ?>"/>
+                            <figcaption><?php echo $user_geolocation['current_observation']['weather']?></figcaption>
+                        </figure>
+                        <h2> <?php echo $user_geolocation['current_observation']['temp_f']?> Fahrenheit </h2>
+                         <h2> <?php echo $user_geolocation['current_observation']['temp_c']?> Celsius </h2>
+                        <small><?php echo $user_geolocation['current_observation']['observation_time']?></small>
+                     </article>
+                     <br/>
+                     <br/>
+                     <br/>
+                     <section>
+                          <?php 
+                            if(!empty($multipleCityMatches) && count($multipleCityMatches) > 0)
+                            {
+                            ?>
+                            <div id="possibleMatches" class="well">
+                                <h3>Which city are you looking for:</h3>
+                                <ul class="possibleMatchList">
+                                    <?php  
+                                    $count=0;
+                                    foreach ($multipleCityMatches as $possibleMatch) 
+                                    {
+                                        $record_id = "possibleMatch_" . $possibleMatch['City']['city_name'] . "_" .$possibleMatch['Country']['iso3']  ;
+                                    ?>
+                                    <li>
+                                      <p>  <?php echo $possibleMatch['City']['city_name'] ?>,
+                                        <?php echo $possibleMatch['Country']['country'] ?>,
+                                         <?php echo $possibleMatch['Country']['region'] ?></p>
+                                        <button id="<?php echo $record_id ?>" class="possibleMatch btn btn-primary" href="#">Choose</button>
+                                       <script>
+                                            var possibleValues = 
+                                            {
+                                                city_name: "<?php echo $possibleMatch['City']['city_name'] ?>",
+                                                country_code_tld: "<?php echo $possibleMatch['Country']['tld'] ?>",
+                                                country_code_iso3: "<?php echo $possibleMatch['Country']['iso3'] ?>",
+                                                country_name: "<?php echo $possibleMatch['Country']['country'] ?>",
+                                                latitude: "<?php echo $possibleMatch['City']['latitude'] ?>",
+                                                longitude: "<?php echo $possibleMatch['City']['longitude'] ?>"
+                                            }
+                                            $("#possibleMatches").data("<?php echo $record_id ?>", possibleValues);
+                                       </script>
+                                       
+                                    </li>
+                                    
+                                    
+                                    <?php    
+                                    } 
+                                    ?>
+                                </ul>    
+                            </div>    
+                            <?php
+                            }
+                            ?>
+                     <?php echo $this->Form->create('Geolocation');
+                            $options = array(
+                            'div' => null,
+                            'class' => 'btn .btn-large', 
+                            'id' => 'submitLocationButton',  
+                            'label' => __('Change My City', true),
+                            );
+                            ?>
+                            
+                            <h2>Update your city</h2>
+                           
+                            <h3>City AutoComplete Search</h3>
+                           <p class=""><strong>Use the  text box below. As you begin typing, a suggestion box with city entries will pop up that you 
+                               must select from to be able to validate your change of location</strong> </p>
+                          
+                           <?php
+                           echo  $form->input('location', array('div'=>null, 'class'=>'input-xlarge', "placeholder"=>__("Start typing a city or country name",true)));
+                           ?>
+                            <p class="help-block"><strong>Note:</strong> There might be a slight delay in between the time you start typing and the moment the suggestion box appears while the data is being retrieved
+                             from the location API depending on your connection. </p>
+                            <h3> OR </h2>
+                             <h3> Choose By Country then City</h3>
+                           <?php
+                           
+                           
+                           echo  $form->input('country_code_tld',  array(
+                                    'options' => $countryList,
+                                    'type' => 'select',
+                                    'empty' => __("-- Select your country --",true),
+                                    'label' => __("Select your country",true)
+                                )
+                            );
+                             echo  $form->input('city_name',  array(
+                                    'options' => array(),
+                                    'type' => 'select',
+                                    'empty' => __("-- Select a country first --",true),
+                                    'label' => __("Select your city",true)
+                                )
+                            );
+                            ?>
+                            
+                          <?php
+                           echo  $form->input('country_name', array('type'=>'hidden'));
+                           echo  $form->input('country_code_iso3', array('type'=>'hidden'));
+                           echo  $form->input('region', array('type'=>'hidden'));
+                           echo  $form->input('latitude', array('type'=>'hidden'));
+                           echo  $form->input('longitude', array('type'=>'hidden'));
+ 
+                           echo $this->Form->end($options);
+                     ?>
+                        
+                  </section>
+                  </div>
+                  
+                  <div id="tablesAndGraphs" class="span8 tabbable well">
+                         <ul class="nav nav-pills">
+                            <li ><a  data-toggle="pill" data-target="#temptables">Past Temperatures Tables</a></li>
+                            <li class="active"><a  data-toggle="pill" data-target="#tempgraphs">Past Temperatures Graphs</a></li>
+                            <li><a data-toggle="pill" data-target="#futuretemps">Future Predictions Graphs</a></li>
+                            <li><a data-toggle="pill" data-target="#futuregraphs">Future Predictions Graphs</a></li>
+                        </ul> 
+                      <div class="tab-content">          
+                          <div id="tempgraphs" class="tab-pane active">
+                                <div id="avgTempByDecadeChart">
+                                    
+                                </div>
+                                <br>
+                                <p class="help-block"><strong>Note:</strong> You can hover over the data points to view the exact value for that point in a too</p>
+                                <br> 
+                                <div id="avgTempByMonthChart">
+                                    
+                                </div>
+                                <br>
+                                <div id="futureAvgTempAnualChart">
+                                </div>
+                          </div>          
+                          
+                          <div id="temptables" class="tab-pane ">
+                              <table class="table table-striped table-bordered table-condensed">
+                                <caption><b><?php echo $user_geolocation['Geolocation']['country_name']  ?>: Average temperatures per decade</b> (Data from the World Bank Climate Change API)</caption>
+                                <thead>
+                                    
+                                     <tr>
+                                    <?php 
+                                        if(is_array($decadeTempAverages['TemperatureValue']))
+                                        {
+                                            foreach ($decadeTempAverages['TemperatureValue'] as $tempByDecade) 
+                                            {
+                                    ?>
+                                   
+                                        <th><?php echo $tempByDecade['year']  ?> </th>
+                                    <?php
+                                            }
+                                        }
+                                    ?>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                     <tr>
+                                    <?
+                                        if(is_array($decadeTempAverages['TemperatureValue']))
+                                        {
+                                            foreach ($decadeTempAverages['TemperatureValue'] as $tempByDecade) 
+                                            {
+                                    ?>
+                                   
+                                        <td>
+                                            <?php
+                                              
+                                                 $celsius = round($tempByDecade['data'], 2);
+                                                  
+                                            ?> 
+                                           <p> <?php echo $celsius; ?> C</p>
+                                        </td>
+                                   
+                                    <?php
+                                            }
+                                        }
+                                    ?>
+                                     </tr>
+                                      <tr>
+                                    <?
+                                        if(is_array($decadeTempAverages['TemperatureValue']))
+                                        {
+                                            foreach ($decadeTempAverages['TemperatureValue'] as $tempByDecade) 
+                                            {
+                                    ?>
+                                   
+                                        <td>
+                                            <?php
+                                                $celsius = $tempByDecade['data'] ;
+                                                $fahr = round(($celsius * 1.8) + 32, 2);
+                                                  
+                                            ?> 
+                                           <p> <?php echo $fahr; ?> F</p>
+                                        </td>
+                                   
+                                    <?php
+                                            }
+                                        }
+                                    ?>
+                                     </tr>
+                                 </tbody>
+                              </table>
+                              
+                              
+                              <table class="table table-striped table-bordered table-condensed">
+                                <caption><b><?php echo $user_geolocation['Geolocation']['country_name']  ?>: Average monthly temperatures from 1901 to 2009</b> (Data from the World Bank Climate Change API)</caption>
+                                <thead>
+                                    
+                                     <tr>
+                                           <th><?php echo __("January");?></th>
+                                          <th><?php echo __("Februry");?></th>
+                                          <th><?php echo __("March");?></th>
+                                          <th><?php echo __("April");?></th>
+                                          <th><?php echo __("May");?></th>
+                                          <th><?php echo __("June");?></th>
+                                          <th><?php echo __("July");?></th>
+                                          <th><?php echo __("August");?></th>
+                                          <th><?php echo __("September");?></th>
+                                          <th><?php echo __("October");?></th>
+                                          <th><?php echo __("November");?></th>
+                                          <th><?php echo __("December");?></th>
+                                               
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                     <tr>
+                                    <?
+                                        if(is_array($monthlyTempAverages['TemperatureValue']))
+                                        {
+                                            foreach ($monthlyTempAverages['TemperatureValue'] as $tempByMonth) 
+                                            {
+                                    ?>
+                                   
+                                        <td>
+                                            <?php
+          
+                                                $celsius = round($tempByDecade['data'], 2);
+                                                  
+                                            ?> 
+                                           <p> <?php echo  $celsius = round($tempByDecade['data'], 2);; ?> C</p>
+                                        </td>
+                                   
+                                    <?php
+                                            }
+                                        }
+                                    ?>
+                                     </tr>
+                                      <tr>
+                                    <?
+                                        if(is_array($monthlyTempAverages['TemperatureValue']))
+                                        {
+                                            foreach ($monthlyTempAverages['TemperatureValue'] as $tempByMonth) 
+                                            {
+                                    ?>
+                                   
+                                        <td>
+                                            <?php
+                                               $celsius = $tempByDecade['data'] ;
+                                                $fahr = round(($celsius * 1.8) + 32, 2);
+                                                  
+                                            ?> 
+                                           <p> <?php echo $fahr; ?> F</p>
+                                        </td>
+                                   
+                                    <?php
+                                            }
+                                        }
+                                    ?>
+                                     </tr>
+                                 </tbody>
+                              </table>
+                              
+                              
+                              <div id="disastersContainer">
+                                <p>
+                                 
+                                <?php
+                                  $this->Paginator->options(array(
+                                                'update' => '#disastersContainer',
+                                                'url' => array_merge(array('updateContainerId' => "disastersContainer"), $this->passedArgs),
+                                                'evalScripts' => true,
+                                                'before' => $js->get('#disastersContainer')->effect('fadeOut', array('buffer' => false)),
+                                                'success' => $js->get('#disastersContainer')->effect('fadeIn', array('buffer' => false))
+                                                ));
+                                  
+                                ?>  
+                                </p>
+                               
+                               <table class="table table-striped table-bordered table-condensed">
+                                <caption><b><?php echo $user_geolocation['Geolocation']['country_name']  ?>: Natural Disasters </b> from EM-DAT International Disaster Database (More up to date data coming soon</caption>
+                                <thead>
+                                    
+                                     <tr>
+                                
+                                   
+                                        <th><?php echo $this->Paginator->sort( __('Disaster Type',true),'disaster_type');?></th>
+                                        <th><?php echo $this->Paginator->sort(__('Victim Toll',true), 'total_killed');?></th>
+                                        <th><?php echo $this->Paginator->sort( __('People Affected',true),'total_affected');?></th>
+                                        <th><?php echo $this->Paginator->sort(__('Estimated Damage',true) . "(000 US $)", 'estimated_damage');?></th>
+                                        <th><?php echo $this->Paginator->sort( __('Year',true),'start_year');?></th>
+                                   
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                       <?
+                                        if(is_array($monthlyTempAverages))
+                                        {
+                                            foreach ($disasters as $disasterObject) 
+                                            {
+                                                $disaster = $disasterObject['Disaster'];
+                                                //debug($disaster);
+                                    ?>
+                                     <tr>
+                                 
+                                   
+                                        <td>
+                                            <?php echo $disaster['disaster_type']  ?> 
+                                        </td>
+                                        <td>
+                                            <?php echo $disaster['total_killed']  ?> 
+                                        </td>
+                                        <td>
+                                            <?php echo $disaster['total_affected']  ?> 
+                                        </td>
+                                        <td>
+                                            <?php echo $disaster['estimated_damage']  ?> 
+                                        </td>
+                                        <td>
+                                            <?php echo $disaster['start_year']  ?> 
+                                        </td>
+                                   
+                                    <?php
+                                           if(count($disasters) == 0)
+                                           {
+                                      ?>
+                                         
+                                         <td colspan="5"><p>No natural disaster data to report on this country</p></td>
+                                        <?php 
+                                           }
+                                        ?>
+                                     </tr>
+                                      <?php    
+                                       
+                                            }
+                                        }
+    
+                                    ?>
+                                     
+                                 </tbody>
+                              </table>
+                              <p>
+                                <?php
+                                echo $this->Paginator->counter(array(
+                                'format' => __('Page %page% of %pages%, showing %current% entries out of %count% total, starting on record %start%, ending on %end%', true)
+                                ));
+                                ?>  
+                            </p>
+                        
+                            <div class="pagination pagination-centered">
+                                <ul>
+                                    <?php echo $this->Paginator->prev('<< ' . __('previous', true), array("tag"=>"li"), null, array('escape'=>false, 'class'=>'disabled',"tag"=>"li", "render_anchor"=>true));?>
+                                    <?php echo $this->Paginator->numbers(array(
+                                                       
+                                                        "active_link"=>"active",
+                                                        "separator" => "",
+                                                        "tag"=>"li"
+                                         ));?>
+                                 
+                                    <?php echo $this->Paginator->next(__('next', true) . ' >>', array("tag"=>"li"), null, array('escape'=>false,'class' => 'disabled', "tag"=>"li","render_anchor"=>true));?>
+                                </ul>
+                            </div>
+                        </div>  
+                        </div> 
+                      </div>
+                  </div>
+            </div>
+            <div class="tab-pane" id="2">
+                <div class="well">
+                  <h3> Favorite locations </h3>
+                    <ul>
+                        <li>
+                            This will allow users to mark as favorite certain locations for quick view. It will have the same features as the main page but “browsable” based on locations
+                        </li>
+                    </ul>
+                </div>
+            </div>
+             <div class="tab-pane" id="3">
+                 <div class="well">
+                <h3>Friend G-Warming Info</h3>
+                <ul>
+                    <li>
+                        This will display user friends (leveraging Facebook, Twitter APIs etc…) to get temperature and disaster data according to friends location
+                    </li>
+                </ul>
+                </div>
+            </div>
+             <div class="tab-pane" id="4">
+                 <div class="well">
+                <h3>  Take Action</h3>
+                <ul>
+                    <li>
+                        Will display suggestions, call to actions, and advices on what to do to minimize the effect of global warming in your local area and in your personal life.
+                    </li>
+                    <li>
+                        Non-profits working for awareness on Global Warming will also be able to use MyWarming as an online tool to direct citizens in positive awareness and action campaigns.
+                    </li>
+                </ul>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+	
+	<script>
+   	     
+	</script>
+	
+	
 	
 </div>
 <?php
 
-/*
- * Array
-(
-    [Geolocation] => Array
-        (
-            [type] => CITY
-            [country] => US
-            [country_iso3166] => US
-            [country_name] => USA
-            [state] => MD
-            [city] => Laurel
-            [tz_short] => EST
-            [tz_long] => America/New_York
-            [lat] => 39.10079956
-            [lon] => -76.88269806
-            [zip] => 20707
-            [magic] => 1
-            [wmo] => 99999
-            [l] => /q/zmw:20707.1.99999
-            [requesturl] => US/MD/Laurel.html
-            [wuiurl] => http://www.wunderground.com/US/MD/Laurel.html
-        )
-
-    [stations] => Array
-        (
-            [airport] => Array
-                (
-                    [station] => Array
-                        (
-                            [0] => Array
-                                (
-                                    [city] => Fort Meade
-                                    [state] => MD
-                                    [country] => US
-                                    [icao] => KFME
-                                    [lat] => 39.09000015
-                                    [lon] => -76.76000214
-                                )
-
-                            [1] => Array
-                                (
-                                    [city] => College Park
-                                    [state] => MD
-                                    [country] => US
-                                    [icao] => KCGS
-                                    [lat] => 38.97999954
-                                    [lon] => -76.91999817
-                                )
-
-                            [2] => Array
-                                (
-                                    [city] => Baltimore
-                                    [state] => MD
-                                    [country] => US
-                                    [icao] => KBWI
-                                    [lat] => 39.18000031
-                                    [lon] => -76.66999817
-                                )
-
-                            [3] => Array
-                                (
-                                    [city] => Gaithersburg
-                                    [state] => MD
-                                    [country] => US
-                                    [icao] => KGAI
-                                    [lat] => 39.16999817
-                                    [lon] => -77.16999817
-                                )
-
-                        )
-
-                )
-
-            [pws] => Array
-                (
-                    [station] => Array
-                        (
-                            [0] => Array
-                                (
-                                    [neighborhood] => Emerson Community
-                                    [city] => Laurel
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => KMDLAURE6
-                                    [distance_km] => 4
-                                    [distance_mi] => 2
-                                )
-
-                            [1] => Array
-                                (
-                                    [neighborhood] => Beaufort Park
-                                    [city] => Fulton
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => KMDFULTO2
-                                    [distance_km] => 7
-                                    [distance_mi] => 4
-                                )
-
-                            [2] => Array
-                                (
-                                    [neighborhood] => Kings Contrivance Village, Dickinson Neighborhood
-                                    [city] => Columbia
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => KMDCOLUM16
-                                    [distance_km] => 7
-                                    [distance_mi] => 4
-                                )
-
-                            [3] => Array
-                                (
-                                    [neighborhood] => Snowden Pond at Montpelier
-                                    [city] => Laurel
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => KMDLAURE5
-                                    [distance_km] => 7
-                                    [distance_mi] => 4
-                                )
-
-                            [4] => Array
-                                (
-                                    [neighborhood] => High Point Homes
-                                    [city] => Beltsville
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => KMDBELTS1
-                                    [distance_km] => 8
-                                    [distance_mi] => 4
-                                )
-
-                            [5] => Array
-                                (
-                                    [neighborhood] => Heritage Woods
-                                    [city] => Jessup
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => KMDJESSU3
-                                    [distance_km] => 8
-                                    [distance_mi] => 5
-                                )
-
-                            [6] => Array
-                                (
-                                    [neighborhood] => APRSWXNET Columbia MD US
-                                    [city] => Columbia
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => MAT657
-                                    [distance_km] => 9
-                                    [distance_mi] => 5
-                                )
-
-                            [7] => Array
-                                (
-                                    [neighborhood] => Boxwood Village
-                                    [city] => Greenbelt
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => KMDGREEN2
-                                    [distance_km] => 9
-                                    [distance_mi] => 5
-                                )
-
-                            [8] => Array
-                                (
-                                    [neighborhood] => Hollywood
-                                    [city] => College Park
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => KMDCOLLE6
-                                    [distance_km] => 10
-                                    [distance_mi] => 6
-                                )
-
-                            [9] => Array
-                                (
-                                    [neighborhood] => Highland
-                                    [city] => Highland
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => KMDHIGHL2
-                                    [distance_km] => 11
-                                    [distance_mi] => 6
-                                )
-
-                            [10] => Array
-                                (
-                                    [neighborhood] => MDDOT MD-175 at MD-295
-                                    [city] => Annapolis Junction
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => MMD031
-                                    [distance_km] => 11
-                                    [distance_mi] => 7
-                                )
-
-                            [11] => Array
-                                (
-                                    [neighborhood] => Hidden Clearing
-                                    [city] => Columbia
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => KMDCOLUM17
-                                    [distance_km] => 11
-                                    [distance_mi] => 7
-                                )
-
-                            [12] => Array
-                                (
-                                    [neighborhood] => Pheasant Ridge
-                                    [city] => Columbia
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => KMDCOLUM15
-                                    [distance_km] => 12
-                                    [distance_mi] => 7
-                                )
-
-                            [13] => Array
-                                (
-                                    [neighborhood] => DDMET Greenbelt, MD
-                                    [city] => Lanham
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => MSA02
-                                    [distance_km] => 12
-                                    [distance_mi] => 7
-                                )
-
-                            [14] => Array
-                                (
-                                    [neighborhood] => Kemp Mill/Silver Spring
-                                    [city] => Silver Spring
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => KMDSILVE4
-                                    [distance_km] => 12
-                                    [distance_mi] => 7
-                                )
-
-                            [15] => Array
-                                (
-                                    [neighborhood] => Kendall Ridge
-                                    [city] => Columbia
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => KMDCOLUM3
-                                    [distance_km] => 12
-                                    [distance_mi] => 7
-                                )
-
-                            [16] => Array
-                                (
-                                    [neighborhood] => Kemp Mill
-                                    [city] => Silver Spring
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => KMDSILVE23
-                                    [distance_km] => 13
-                                    [distance_mi] => 7
-                                )
-
-                            [17] => Array
-                                (
-                                    [neighborhood] => Dorchester
-                                    [city] => Hanover
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => KMDHANOV2
-                                    [distance_km] => 13
-                                    [distance_mi] => 8
-                                )
-
-                            [18] => Array
-                                (
-                                    [neighborhood] => Wilde Lake
-                                    [city] => Columbia
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => KMDCOLUM10
-                                    [distance_km] => 13
-                                    [distance_mi] => 8
-                                )
-
-                            [19] => Array
-                                (
-                                    [neighborhood] => Northridge
-                                    [city] => Bowie
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => KMDBOWIE2
-                                    [distance_km] => 14
-                                    [distance_mi] => 8
-                                )
-
-                            [20] => Array
-                                (
-                                    [neighborhood] => Triadelphia Reservoir
-                                    [city] => Brookeville
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => KMDBROOK3
-                                    [distance_km] => 15
-                                    [distance_mi] => 9
-                                )
-
-                            [21] => Array
-                                (
-                                    [neighborhood] => Sandy Ridge Weather
-                                    [city] => Elkridge
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => KMDELKRI1
-                                    [distance_km] => 15
-                                    [distance_mi] => 9
-                                )
-
-                            [22] => Array
-                                (
-                                    [neighborhood] => Saddlebrook West
-                                    [city] => Bowie
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => KMDBOWIE1
-                                    [distance_km] => 15
-                                    [distance_mi] => 9
-                                )
-
-                            [23] => Array
-                                (
-                                    [neighborhood] => Piney Orchard/Station
-                                    [city] => Odenton
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => KMDODENT2
-                                    [distance_km] => 16
-                                    [distance_mi] => 9
-                                )Geolocation
-
-                            [24] => Array
-                                (
-                                    [neighborhood] => Wheaton
-                                    [city] => Silver Spring
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => KMDWHEAT1
-                                    [distance_km] => 16
-                                    [distance_mi] => 9
-                                )
-
-                            [25] => Array
-                                (
-                                    [neighborhood] => Riverdale Park
-                                    [city] => Riverdale
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => KMDRIVER3
-                                    [distance_km] => 16
-                                    [distance_mi] => 9
-                                )
-
-                            [26] => Array
-                                (
-                                    [neighborhood] => Elm & Larch, SOSCA
-                                    [city] => Takoma Park
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => KMDTAKOM2
-                                    [distance_km] => 16
-                                    [distance_mi] => 9
-                                )
-
-                            [27] => Array
-                                (
-                                    [neighborhood] => 
-                                    [city] => Ellicott City
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => KMDELLIC14
-                                    [distance_km] => 16
-                                    [distance_mi] => 10
-                                )
-
-                            [28] => Array
-                                (
-                                    [neighborhood] => Stone Hill Farm
-                                    [city] => Ellicott City
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => KMDELLIC12
-                                    [distance_km] => 16
-                                    [distance_mi] => 10
-                                )
-
-                            [29] => Array
-                                (
-                                    [neighborhood] => APRSWXNET Silver Spring MD US
-                                    [city] => Silver Spring
-                                    [state] => MD
-                                    [country] => US
-                                    [id] => MD9421
-                                    [distance_km] => 16
-                                    [distance_mi] => 10
-                                )
-
-                        )
-
-                )
-
-        )
-
-    [current_observation] => Array
-        (
-            [image] => Array
-                (
-                    [url] => http://icons-ak.wxug.com/graphics/wu2/logo_130x80.png
-                    [title] => Weather Underground
-                    [link] => http://www.wunderground.com
-                )
-
-            [display_location] => Array
-                (
-                    [full] => Laurel, MD
-                    [city] => Laurel
-                    [state] => MD
-                    [state_name] => Maryland
-                    [country] => US
-                    [country_iso3166] => US
-                    [zip] => 20707
-                    [latitude] => 39.10079956
-                    [longitude] => -76.88269806
-                    [elevation] => 98.00000000
-                )
-
-            [observation_location] => Array
-                (
-                    [full] => Emerson Community, Laurel, Maryland
-                    [city] => Emerson Community, Laurel
-                    [state] => Maryland
-                    [country] => US
-                    [country_iso3166] => US
-                    [latitude] => 39.140446
-                    [longitude] => -76.859924
-                    [elevation] => 344 ft
-                )
-
-            [estimated] => Array
-                (
-                )
-
-            [station_id] => KMDLAURE6
-            [observation_time] => Last Updated on March 2, 3:48 PM EST
-            [observation_time_rfc822] => Fri, 02 Mar 2012 15:48:40 -0500
-            [observation_epoch] => 1330721320
-            [local_time_rfc822] => Fri, 02 Mar 2012 15:48:42 -0500
-            [local_epoch] => 1330721322
-            [local_tz_short] => EST
-            [local_tz_long] => America/New_York
-            [local_tz_offset] => -0500
-            [weather] => Overcast
-            [temperature_string] => 50.5 F (10.3 C)
-            [temp_f] => 50.5
-            [temp_c] => 10.3
-            [relative_humidity] => 73%
-            [wind_string] => From the ESE at 11.0 MPH Gusting to 11.0 MPH
-            [wind_dir] => ESE
-            [wind_degrees] => 115
-            [wind_mph] => 11
-            [wind_gust_mph] => 11.0
-            [wind_kph] => 17.7
-            [wind_gust_kph] => 17.7
-            [pressure_mb] => 1013.4
-            [pressure_in] => 29.93
-            [pressure_trend] => +
-            [dewpoint_string] => 42 F (6 C)
-            [dewpoint_f] => 42
-            [dewpoint_c] => 6
-            [heat_index_string] => NA
-            [heat_index_f] => NA
-            [heat_index_c] => NA
-            [windchill_string] => NA
-            [windchill_f] => NA
-            [windchill_c] => NA
-            [visibility_mi] => 10.0
-            [visibility_km] => 16.1
-            [solarradiation] => 46
-            [UV] => 0.0
-            [precip_1hr_string] => 0.00 in ( 0 mm)
-            [precip_1hr_in] => 0.00
-            [precip_1hr_metric] =>  0
-            [precip_today_string] => 0.00 in (0 mm)
-            [precip_today_in] => 0.00
-            [precip_today_metric] => 0
-            [icon] => cloudy
-            [icon_url] => http://icons-ak.wxug.com/i/c/k/cloudy.gif
-            [forecast_url] => http://www.wunderground.com/US/MD/Laurel.html
-            [history_url] => http://www.wunderground.com/history/airport/KMDLAURE6/2012/3/2/DailyHistory.html
-            [ob_url] => http://www.wunderground.com/cgi-bin/findweather/getForecast?query=39.140446,-76.859924
-        )
-
-    [response] => Array
-        (
-            [version] => 0.1
-            [termsofService] => http://www.wunderground.com/weather/api/d/terms.html
-            [features] => Array
-                (
-                    [geolookup] => 1
-                    [conditions] => 1
-                )
-
-        )
-
-)
-
-
- * 
- */
 ?>

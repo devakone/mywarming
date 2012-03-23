@@ -1,0 +1,14 @@
+.footer
+{
+	text-align:center;
+	padding-top:20px;
+}
+
+#possibleMatches ul{
+	margin:5px 0 5px 0;
+}
+
+
+#possibleMatches ul li{
+	margin-bottom:5px;
+}

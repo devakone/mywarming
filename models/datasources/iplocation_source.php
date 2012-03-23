@@ -120,7 +120,7 @@ class IplocationSource extends DataSource
     	$auth = "key={$config['api_key']}";
     	$url = "{$config['url']}";
     	$this->apiUrl =  "{$url}?{$auth}&format=json&";
-    	debug($this->apiUrl);
+    	//debug($this->apiUrl);
     	$this->connection = new HttpSocket();
     	parent::__construct($config);
     }
@@ -155,7 +155,7 @@ class IplocationSource extends DataSource
     	
     public function describe($model)
     {
-    	return $this->_schema['location'];
+    	return $this->_schema['Iplocation'];
     }
 }
 ?>

@@ -25,6 +25,8 @@ class WuGeolookupSource extends DataSource
     (
     	"Geolocation" => array
     	(
+			
+			
 			"id"=>array
 			(
     
@@ -72,13 +74,13 @@ class WuGeolookupSource extends DataSource
 		    ),
 		    "state"=>array
 		    (
-		    
           		'type' => 'string',
             	'null' => true,
             	'key' => 'primary',
             	'length' => 60,
 		     
-		    ),"city"=>array
+		    )
+		    ,"city"=>array
 		    (
 		    
           		'type' => 'string',
@@ -86,7 +88,17 @@ class WuGeolookupSource extends DataSource
             	'key' => 'primary',
             	'length' => 60,
 		     
-		    ),"tz_short"=>array
+		    )
+		    ,"location"=>array
+		    (
+		    
+		              		'type' => 'string',
+		                	'null' => true,
+		                	'key' => 'primary',
+		                	'length' => 60,
+		     
+		    )
+		    ,"tz_short"=>array
 		    (
 		    
           		'type' => 'string',
@@ -99,7 +111,7 @@ class WuGeolookupSource extends DataSource
 		    
           		'type' => 'string',
             	'null' => true,
-            	'key' => 'primary',
+            	'key' => 'primary',		    
             	'length' =>60,
 		     
 		    ),"lat"=>array
@@ -196,7 +208,7 @@ class WuGeolookupSource extends DataSource
     {
     	if (!isset($queryData['conditions']['ip'])) 
     	{
-    		$queryData['conditions']['ip'] = "74.125.45.100";
+    		//$queryData['conditions']['ip'] = "74.125.45.100";
     	}
     	$query = "/q/";
     	if(isset($queryData['conditions']['ip']) && !empty($queryData['conditions']['ip']))
@@ -204,13 +216,38 @@ class WuGeolookupSource extends DataSource
     		$this->apiUrl .= "/geolookup/conditions";
     		$query = "/q/autoip.json?geo_ip=" . $queryData['conditions']['ip'];
     	}
+    	if(isset($queryData['conditions']['latitude']) && isset($queryData['conditions']['longitude']))
+    	{
+    		$this->apiUrl .= "/geolookup/conditions";
+    		$query = "/q/" . $queryData['conditions']['latitude']."," . $queryData['conditions']['longitude']. ".json" ;
+    	}
+    	else if(isset($queryData['conditions']['location']) && isset($queryData['conditions']['country']) )
+    	{
+    		$this->apiUrl .= "/geolookup/conditions";
+    		$query = "/q/" . url_encode($queryData['conditions']['country']) ."/" . url_encode($queryData['conditions']['location']) . ".json";
+    	}
+    	else if(isset($queryData['conditions']['location']) && isset($queryData['conditions']['date']) )
+    	{
+    		$this->apiUrl .= "/history_" . $queryData['conditions']['date'] ;
+    		$query = "/q/" . $queryData['conditions']['location'] . ".json";
+    	}
     	//debug($this->apiUrl . $query);
     	$response = json_decode($this->connection->get($this->apiUrl . $query), true);
     	//debug($response);
-    	$record = array('Geolocation' => $response['location']);
-    	$record['stations'] = $response['location']['nearby_weather_stations'];
-    	$record['current_observation'] = $response['current_observation'];
-    	unset($record['Geolocation']['nearby_weather_stations'] );
+    	if(isset($response['location']))
+    	{
+	    	$record = array('Geolocation' => $response['location']);
+	    	$record['stations'] = $response['location']['nearby_weather_stations'];
+	    	$record['current_observation'] = $response['current_observation'];
+	    	unset($record['Geolocation']['nearby_weather_stations'] );
+	    	
+    	}
+    	else
+    	{
+    		$record = array('Geolocation' => array());
+    		$record['stations'] = array();
+    		$record['current_observation'] =array();
+    	}
     	$record['response'] = $response['response'];
     
     	
@@ -221,7 +258,7 @@ class WuGeolookupSource extends DataSource
     	
     public function describe($model)
     {
-    	return $this->_schema['location'];
+    	return $this->_schema['Geolocation'];
     }
 }
 ?>

@@ -50,6 +50,7 @@
  *
  */
 	if (!defined('CAKE_CORE_INCLUDE_PATH')) {
+		#define('CAKE_CORE_INCLUDE_PATH',  DS . 'home' .  DS . 'warming' . DS . 'cakephp' );
 		define('CAKE_CORE_INCLUDE_PATH',  DS . 'media' . DS . 'DATA' . DS . 'Development' . DS . 'www' . DS . 'cakephp');
 	}
 

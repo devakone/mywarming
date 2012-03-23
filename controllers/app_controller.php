@@ -32,6 +32,11 @@
  */
 class AppController extends Controller {
 	
-	var $components = array('Session','Email','DebugKit.Toolbar');
-	var $helpers = array('Html', 'Form', 'Session','Js' => array('Jquery'));
+	var $components = array('Session','Email','RequestHandler' ,  'DebugKit.Toolbar');
+	var $helpers = array('Html', 'Form', 'Session');
+	
+	function beforeFilter()
+	{
+		$this->RequestHandler->setContent('json', 'text/x-json');
+	}
 }

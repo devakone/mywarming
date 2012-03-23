@@ -22,16 +22,32 @@
 <head>
 	<?php echo $this->Html->charset(); ?>
 	<title>
-		<?php __('CakePHP: the rapid development php framework:'); ?>
+		<?php __('My Global Warming Dashboard'); ?>
 		<?php echo $title_for_layout; ?>
 	</title>
 	<?php
 		echo $this->Html->meta('icon');
 
-		echo $this->Html->css(array('bootstrap','bootstrap-responsive','prettify'));
-        echo $this->Html->script(array('jquery', 'bootstrap-alerts','bootstrap-tabs', 'bootstrap-buttons', 'bootstrap-modal', 'bootstrap-popover' ,'bootstrap-tabs', 'bootstrap-twipsy','prettify'));
+		echo $this->Html->css(array('ext-all','bootstrap','bootstrap-responsive','prettify', 'jquery-ui-1.8.18.custom', 'warming', ));
+        echo $this->Html->script(array('ext-all-dev','jquery-1.7.1.min','jquery-ui-1.8.18.custom.min','bootstrap-alerts','bootstrap-tab', 'bootstrap-buttons', 'bootstrap-dropdown', 'bootstrap-modal','bootstrap-tooltip', 'bootstrap-popover' , 'bootstrap-twipsy','prettify','warming'));
 		echo $scripts_for_layout;
 	?>
+	<script type="text/javascript">
+    if (document.location.hostname.search("indexdot") < 0) {
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-30110137-1']);
+      _gaq.push(['_trackPageview']);
+    
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    }
+    </script>
+    
+    <!--<script type="text/javascript" charset="utf-8" src="http://cdn.sencha.io/ext-4.0.7-gpl/ext-all.js"></script>-->
+
 </head>
 <body>
 	<div class="container">
@@ -44,23 +60,19 @@
                       <span class="icon-bar"></span>
                       <span class="icon-bar"></span>
                     </a>
-                    <a class="brand" href="#">My Global Warming Dashboard</a>
+                    <?php echo $html->link(__("My Global Warming Dashboard (Beta)", true), array("controller"=>"geolocations", "action"=>"index"), array("class"=>"brand")); ?>
                     <div class="nav-collapse">
                       <ul class="nav">
                         <li class="active"><?php echo $html->link(__("Home", true), array("controller"=>"geolocations", "action"=>"index")); ?></li>
-                        <li><a href="#">Information</a></li>
-                        <li><a href="#">Twitter Feed</a></li>
-                        <li><a href="#">Link</a></li>
+                        <li><?php echo $html->link(__("Information", true), array("controller"=>"pages", "action"=>"display", "information")); ?></li>
+                        <li><?php echo $html->link(__("Twitter Feed", true), array("controller"=>"geolocations", "action"=>"twitter_feed")); ?></li>
                         <li class="dropdown">
-                          <a href="#" class="dropdown-toggle" data-toggle="dropdown">What can I do?<b class="caret"></b></a>
+                           <?php echo $html->link(__("What can i do?", true) . "<b class=\"caret\"></b>", array("controller"=>"pages", "action"=>"display", "what_can_i_do"), array("escape"=>false,"class"=>"dropdown-toggle", "data-toggle"=>"dropdown")); ?>
+                          
                           <ul class="dropdown-menu">
-                            <li><a href="#">Action</a></li>
-                            <li><a href="#">Another action</a></li>
-                            <li><a href="#">Something else here</a></li>
-                           <li class="divider"></li>
-                            <li class="nav-header">Nav header</li>
-                            <li><a href="#">Separated link</a></li>
-                            <li><a href="#">One more separated link</a></li>
+                            <li><?php echo $html->link(__("Stop Global Warming", true), array("controller"=>"geolocations", "action"=>"twitter_feed")); ?></li>
+                          
+                          
                           </ul>
                         </li>
                       </ul>
@@ -68,16 +80,25 @@
                         <input class="search-query span2" placeholder="Search" type="text">
                       </form>
                       <ul class="nav pull-right">
-                        <li><a href="#">Link</a></li>
-                        <li class="divider-vertical"></li>
                         <li class="dropdown">
-                          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Coders4Africa <b class="caret"></b></a>
+                         
+                          <?php echo $html->link(__("Coders4Africa", true) . "<b class=\"caret\"></b>", "http://www.coders4africa.org", array("escape"=>false,"class"=>"dropdown-toggle", "data-toggle"=>"dropdown")); ?>
+                          
                           <ul class="dropdown-menu">
-                            <li><a href="#">Our Work</a></li>
-                            <li><a href="#">Our Projects</a></li>
-                            <li><a href="#">Become a member</a></li>
-                            <li class="divider"></li>
-                            <li><a href="#">Separated link</a></li>
+                            <li> 
+                                <?php echo $html->link(__("About Us", true), "http://www.coders4africa.org/index.php?option=com_content&view=article&id=58&Itemid=89"); ?>
+                            </li>
+                           
+                            <li>
+                                <?php echo $html->link(__("Our Projects", true), "http://www.coders4africa.org/index.php?option=com_projectfork&workspace=2&section=projects&Itemid=115&lang=en"); ?>
+                            </li>
+                            
+                            <li>
+                                <?php echo $html->link(__("Become a Member", true), "http://www.coders4africa.org/index.php?option=com_community&view=register&Itemid=88"); ?>
+                            
+                            </li>
+                           
+                           
                           </ul>
                         </li>
                       </ul>
@@ -89,25 +110,27 @@
             </div>
 		</div>
 		<div class="row">
-		    <div class="span4">
+		    <div class="span12">
 		   
 		            
-		        </header>
+		       <?php echo $this->Session->flash(); ?>
 		        
 		    </div>
-            <div class="span8">
-                
-                <?php echo $this->Session->flash(); ?>
-
-                <?php echo $content_for_layout; ?>
-            </div>
-
-			
-
+       
 		</div>
 		<div class="row">
-			
-		
+		      <?php echo $content_for_layout; ?>
+		</div>
+		<div class="row-fluid footer">
+		   
+			 <p><i> 
+			     Copyright &copy; 2012 <?php echo $this->Html->link(__('Coders4Africa', true), 'http://www.coders4africa.org'); ?>, <?php echo $this->Html->link(__('Index Dot LLC', true), 'http://www.idxdot.net', array("shape"=>"rect")); ?>
+		          </i>
+		       </p>
+		  <p><i>
+                This application aggregates data from  <?php echo $this->Html->link(__('The World Bank\'s Climate Data API ', true), 'http://data.worldbank.org/developers/climate-data-api'); ?>, <?php echo $this->Html->link(__('Wunderground Weather API', true), 'http://www.wunderground.com/weather/api/', array()); ?>
+                , and from <?php echo $this->Html->link(__('EM-DAT International Disaster Database', true), 'http://www.emdat.be/', array()); ?>
+       </i></p>
 		</div>
 	</div>
 	
