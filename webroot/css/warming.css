@@ -12,3 +12,7 @@
 #possibleMatches ul li{
 	margin-bottom:5px;
 }
+
+.x-border-box, .x-border-box * {
+    -moz-box-sizing: content-box;
+}
