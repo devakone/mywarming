@@ -4,6 +4,7 @@
  var AverageTemperatureByDecadeChart;
  var AverageTemperatureByMonthChart;
 
+ 
  function createAverageByDecadeChart()
  {
  		if(!Ext.getCmp("averageByDecadeExtChart"))
@@ -18,6 +19,10 @@
  	           // height: 300,
  	            animate:true,
  	            id:"averageByDecadeExtChart",
+ 	            legend: {
+ 	              position: 'bottom',
+ 	              padding:20
+ 	           },
  	            axes: 
  	            [
  	                 {
@@ -25,8 +30,8 @@
  	                     type: 'Numeric',
  	                     position: 'left',
  	                     fields: ['year_celsius_temp', 'year_fahr_temp'],
- 	                     minimum: 0,
- 	                     maximum: 50,
+ 	                     minimum: -10,
+ 	                     maximum: 100,
  	                     minorTickSteps: 10
  	                 },
  	                 {
@@ -45,7 +50,7 @@
  	                      axis: ['left'],
  	                     xField: 'year',
  	                     yField: 'year_celsius_temp',
- 	                     title:'Average temperatures per decade in Celsius',
+ 	                     title:'Average temperature in Celsius',
  	                     tips: 
  	                     {
  	                    	  trackMouse: true,
@@ -62,7 +67,7 @@
  	                      axis: ['left'],
  	                     xField: 'year',
  	                     yField: 'year_fahr_temp',
- 	                    title:'Average temperatures per decade in Fahrenheit',
+ 	                    title:'Average temperature in Fahrenheit',
  	                    tips: 
  	                     {
  	                    	  trackMouse: true,
@@ -81,8 +86,8 @@
  	          //Add the chart to the page..  
  	         Ext.create('Ext.panel.Panel', {
  	         layout: 'fit', 
- 	         width: 600,
- 	         height: 300,
+ 	         width: 700,
+ 	         height: 400,
  	         renderTo:'avgTempByDecadeChart',
  	         //autoShow:true,
  	         //autoRender: Ext.Element.get('avgTempByDecadeChart'),
@@ -106,6 +111,9 @@
 	           // width: 450,
 	           // height: 300,
 	            id:"averageByMonthExtChart",
+	            legend: {
+	                position: 'bottom'
+	            },
 	            axes: 
 	            [
 	                 {
@@ -114,7 +122,7 @@
 	                     position: 'left',
 	                     fields: ['month_celsius_temp','month_fahr_temp'],
 	                     minimum: -10,
-	                     maximum: 90,
+	                     maximum: 100,
 	                     minorTickSteps: 10
 	                 },
 	                 {
@@ -131,7 +139,7 @@
 	                      axis: 'left',
 	                     xField: 'month_label',
 	                     yField: 'month_celsius_temp',
-	                     title:'Monthly Average temperatures per decade (1901-2009) in Celsius',
+	                     title:'Average temperature in Celsius(1901-2009)',
 	                     tips: 
 	                     {
 	                    	  trackMouse: true,
@@ -147,7 +155,7 @@
 	                      axis: 'left',                    
 	                     xField: 'month_label',
 	                     yField: 'month_fahr_temp',
-	                     title:'Monthly Average temperatures per decade (1901-2009) in Fahrenheit',
+	                     title:'Average temperature in Fahrenheit(1901-2009)',
 	                     tips: 
 	                     {
 	                    	  trackMouse: true,
@@ -165,8 +173,8 @@
 	          //Add the chart to the page..  
 	         Ext.create('Ext.panel.Panel', {
 	         layout: 'fit', 
-	         width: 600,
-	         height: 300,
+	         width: 700,
+	         height: 400,
 	         renderTo:'avgTempByMonthChart',
 	         //autoShow:true,
 	         //renderTo: Ext.Element.get('avgTempByMonthChart'),
@@ -283,7 +291,7 @@ Ext.onReady(function()
             proxy: 
             {
                 type: 'ajax',
-                url : '/mywarming/geolocations/get_temp_average_by_decade.json',
+                url : AverageTemperatureByDecadeStoreURL,
                 reader: 
                 {
                     type:'json',
@@ -292,7 +300,7 @@ Ext.onReady(function()
                 }
              
             },
-            //autoLoad: true ,
+            autoLoad: true ,
             listeners:
             	{
             	 	load:function(store, records, successful, operation, eOpts)
@@ -312,7 +320,7 @@ Ext.onReady(function()
             proxy: 
             {
                 type: 'ajax',
-                url : '/mywarming/geolocations/get_monthly_average.json',
+                url : AverageTemperatureByMonthStoreURL,
                 reader: 
                 {
                     type:'json',
@@ -321,7 +329,7 @@ Ext.onReady(function()
                 }
              
             },
-           // autoLoad: true ,
+            autoLoad: true ,
             listeners:
         	{
         	 	load:function(store, records, successful, operation, eOpts)
@@ -341,7 +349,7 @@ Ext.onReady(function()
             proxy: 
             {
                 type: 'ajax',
-                url : '/mywarming/geolocations/get_temperature_annual_prediction.json',
+                url : FutureAnnualAverageTemperatureStoreURL,
                 reader: 
                 {
                     type:'json',
@@ -350,13 +358,13 @@ Ext.onReady(function()
                 }
              
             },
-            autoLoad: true ,
+           // autoLoad: true ,
             listeners:
         	{
         	 	load:function(store, records, successful, operation, eOpts)
         	 	{
         	 		//console.dir(records);
-        	 		createFutureAnnualAverageTemperatureChart();
+        	 		//createFutureAnnualAverageTemperatureChart();
         	 	}
         	 
         	}
@@ -382,7 +390,7 @@ $(document).ready(function(){
         if(activatedTabId == "#tempgraphs")
         { 
         	//createAverageByDecadeChart();
-        	// createMonthlyAverageChart();
+        	//createMonthlyAverageChart();
         }
      })
      
@@ -414,21 +422,31 @@ $(document).ready(function(){
 	{
 		var input = $(this);
 		var selectedCountry = input.val();
-		var url = "/mywarming/geolocations/get_city_list.json";
-		$.getJSON(url, {country_tld: selectedCountry}, function(cities,status, xhr) {  
+		$("#controls").mask("Loading...");
+
+		var jqxhr =  $.getJSON(cityListURL, {country_tld: selectedCountry}, function(response,status, xhr) {  
 			$("#GeolocationCityName").html('');
-			if(cities)
+			if(response.cities && response.count )
 			{
 				 var options = '';
 				 
-				  $.each(cities, function(tld, city_name) {
+				  $.each(response.cities, function(tld, city_name) {
 				    options += '<option value="' + tld + '">' + city_name + '</option>';
 				  });
 				  $("#GeolocationCityName").html(options);
+				  if(response.count >30000)
+				  {
+					  	alert("There are " + response.count + " cities in this country. Use the Autosuggest Box to find your desired city.");
+					  	$("#GeolocationLocation").focus();
+						$("#controls").unmask();
+				  }
 				
 			}
+			
+			$("#controls").unmask();
         	
-   		 });  
+   		 }).error(function(){alert("There was an error retrieving the data! Try again or use the AutoSuggestion box.");$("#controls").unmask();})
+   		
 		
 		
 	}		
@@ -436,31 +454,26 @@ $(document).ready(function(){
 	)
 	
 	$('#GeolocationCountryCityName').on('change', function()
-	{
-		var input = $(this);
-		var selected = input.val();
-		var geolocations = selected.split("_");
-		var latitude = selected[0];
-		var longitude = selected[1];
-		$('#GeolocationLatitude').val(latitude);
-		$('#GeolocationLongitude').val(longitude);
-		
-		
-	}		
+		{
+			var input = $(this);
+			var selected = input.val();
+			var geolocations = selected.split("_");
+			var latitude = selected[0];
+			var longitude = selected[1];
+			$('#GeolocationLatitude').val(latitude);
+			$('#GeolocationLongitude').val(longitude);	
+			$('#GeolocationLocation').val(input.text()) ;
+		}		
 	
 	)
 	
 	$("#GeolocationIndexForm").submit(function()
 		{
 			
-			if(!$('#GeolocationLocation').val() )
-			{
-				alert("Please enter a location to search for!");
-				return false;
-			}
+			
 			if(!$('#GeolocationLatitude').val() && !!$('#GeolocationLatitude').val())
 			{
-				alert("We are missing your information needed to submit. Make sure to select from the autosuggestions ");
+				alert("We are missing some information needed to submit. Check and try again ");
 				//return false;
 			}
 			return true;
@@ -473,14 +486,14 @@ $(document).ready(function(){
 	$( "#GeolocationLocation" ).autocomplete({
 		source: function( request, response ) {
 			//pass request to server  
-			var url="/mywarming/geolocations/search_country.json";
+			
 			var term = request.term;
 			if ( term in cache ) {
 				response( cache[ term ] );
 				return;
 			}
 			//var url="/geolocations/search_country.json";
-			lastXhr = $.getJSON(url, request, function(data,status, xhr) {  
+			lastXhr = $.getJSON(searchCountryUrl, request, function(data,status, xhr) {  
 				
 	            //create array for response objects  
 	            var suggestions = [];  
@@ -489,13 +502,14 @@ $(document).ready(function(){
 	            //console.dir(data);
 	            $.each(data, function(i, item)
 	                    {  
-//	            	/console.dir(item);
+	            		//console.dir(item);
 	            			suggestions.push(
 	            					
 	                    			{
 	                    				label: item.City.city_name + ", " + item.Country.country + ", " + item.Country.region,
 	    								value: item.City.city_name,
 	    								country_code: item.Country.iso3,
+	    								country_code_tld: item.Country.tld,
 	    								country_name: item.Country.country,
 	    								latitude: item.City.latitude,
 	    								longitude: item.City.longitude
@@ -515,10 +529,11 @@ $(document).ready(function(){
 		minLength: 2,
 		select: function( e, ui ) {
 			//console.log( ui.item ?	"Selected: " + ui.item.label :	"Nothing selected, input was " + this.value);
-			console.dir(ui);
-			var country_code = (ui.item && ui.item.country_code)?ui.item.country_code:'USA';
-			$('#GeolocationCountryCodeTld').val(country_code);
-			$('#GeolocationCountryName').val(country_code);
+			//console.dir(ui);
+			//var country_code = (ui.item && ui.item.country_code)?ui.item.country_code:'USA';
+			$('#GeolocationCountryCodeTld').val(ui.item.country_code_tld);
+			$('#GeolocationCountryCodeIso3').val(ui.item.country_code);
+			$('#GeolocationCountryName').val(ui.item.country_name);
 			$('#GeolocationLatitude').val(ui.item.latitude);
 			$('#GeolocationLongitude').val(ui.item.longitude);
 			

@@ -10,7 +10,7 @@
         </ul>
         <div class="tab-content">
             <div class="tab-pane active" id="1">
-                <div class="span3">
+                <div id="controls" class="span3">
                     <article>
                         <address>
                             <h1><?php echo $user_geolocation['Geolocation']['city']  ?> </h1>
@@ -90,29 +90,10 @@
                            ?>
                             <p class="help-block"><strong>Note:</strong> There might be a slight delay in between the time you start typing and the moment the suggestion box appears while the data is being retrieved
                              from the location API depending on your connection. </p>
-                            <h3> OR </h2>
-                             <h3> Choose By Country then City</h3>
-                           <?php
-                           
-                           
-                           echo  $form->input('country_code_tld',  array(
-                                    'options' => $countryList,
-                                    'type' => 'select',
-                                    'empty' => __("-- Select your country --",true),
-                                    'label' => __("Select your country",true)
-                                )
-                            );
-                             echo  $form->input('city_name',  array(
-                                    'options' => array(),
-                                    'type' => 'select',
-                                    'empty' => __("-- Select a country first --",true),
-                                    'label' => __("Select your city",true)
-                                )
-                            );
-                            ?>
-                            
+             
                           <?php
                            echo  $form->input('country_name', array('type'=>'hidden'));
+                            echo  $form->input('country_code_tld', array('type'=>'hidden'));
                            echo  $form->input('country_code_iso3', array('type'=>'hidden'));
                            echo  $form->input('region', array('type'=>'hidden'));
                            echo  $form->input('latitude', array('type'=>'hidden'));
@@ -126,8 +107,9 @@
                   
                   <div id="tablesAndGraphs" class="span8 tabbable well">
                          <ul class="nav nav-pills">
-                            <li ><a  data-toggle="pill" data-target="#temptables">Past Temperatures Tables</a></li>
+                           
                             <li class="active"><a  data-toggle="pill" data-target="#tempgraphs">Past Temperatures Graphs</a></li>
+                             <li ><a  data-toggle="pill" data-target="#temptables">Past Temperatures Tables</a></li>
                             <li><a data-toggle="pill" data-target="#futuretemps">Future Predictions Graphs</a></li>
                             <li><a data-toggle="pill" data-target="#futuregraphs">Future Predictions Graphs</a></li>
                         </ul> 
@@ -137,7 +119,7 @@
                                     
                                 </div>
                                 <br>
-                                <p class="help-block"><strong>Note:</strong> You can hover over the data points to view the exact value for that point in a too</p>
+                                <p class="help-block"><strong>Note:</strong> You can hover over the data points to view the exact value for that point in a tooltip</p>
                                 <br> 
                                 <div id="avgTempByMonthChart">
                                     
@@ -145,8 +127,14 @@
                                 <br>
                                 <div id="futureAvgTempAnualChart">
                                 </div>
-                          </div>          
-                          
+                          </div> 
+                          <div id="futuregraphs" class="tab-pane">
+                              <h3>Coming soon!</h3>
+                          </div>   
+                               
+                           <div id="futuretemps" class="tab-pane">
+                               <h3>Coming soon!</h3>
+                          </div>   
                           <div id="temptables" class="tab-pane ">
                               <table class="table table-striped table-bordered table-condensed">
                                 <caption><b><?php echo $user_geolocation['Geolocation']['country_name']  ?>: Average temperatures per decade</b> (Data from the World Bank Climate Change API)</caption>

@@ -27,24 +27,32 @@
 	</title>
 	<?php
 		echo $this->Html->meta('icon');
-
-		echo $this->Html->css(array('ext-all','bootstrap','bootstrap-responsive','prettify', 'jquery-ui-1.8.18.custom', 'warming', ));
-        echo $this->Html->script(array('ext-all-dev','jquery-1.7.1.min','jquery-ui-1.8.18.custom.min','bootstrap-alerts','bootstrap-tab', 'bootstrap-buttons', 'bootstrap-dropdown', 'bootstrap-modal','bootstrap-tooltip', 'bootstrap-popover' , 'bootstrap-twipsy','prettify','warming'));
-		echo $scripts_for_layout;
+		echo $this->Html->css(array('ext-all','bootstrap','bootstrap-responsive','prettify', 'jquery-ui-1.8.18.custom','jquery.loadmask', 'warming', ));  
 	?>
 	<script type="text/javascript">
-    if (document.location.hostname.search("indexdot") < 0) {
-      var _gaq = _gaq || [];
-      _gaq.push(['_setAccount', 'UA-30110137-1']);
-      _gaq.push(['_trackPageview']);
-    
-      (function() {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-      })();
-    }
+        if (document.location.hostname.search("indexdot") < 0) 
+        {
+              var _gaq = _gaq || [];
+              _gaq.push(['_setAccount', 'UA-30110137-1']);
+              _gaq.push(['_trackPageview']);
+            
+              (function() {
+                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+              })();
+         }
+         var contextPath = "<?php echo $this->Html->url("/") ?>";
+         var AverageTemperatureByDecadeStoreURL = contextPath + 'geolocations/get_temp_average_by_decade.json';
+         var AverageTemperatureByMonthStoreURL = contextPath + 'geolocations/get_monthly_average.json';
+         var FutureAnnualAverageTemperatureStoreURL = contextPath + 'geolocations/get_temperature_annual_prediction.json';
+         var cityListURL = contextPath +"geolocations/get_city_list.json";
+         var searchCountryUrl = contextPath +"geolocations/search_country.json";
     </script>
+    <?php
+        echo $this->Html->script(array('ext-all-dev','jquery-1.7.1.min','jquery-ui-1.8.18.custom.min','jquery.loadmask.min','bootstrap-alerts','bootstrap-tab', 'bootstrap-buttons', 'bootstrap-dropdown', 'bootstrap-modal','bootstrap-tooltip', 'bootstrap-popover' , 'bootstrap-twipsy','prettify','warming'));
+        echo $scripts_for_layout;
+    ?>
     
     <!--<script type="text/javascript" charset="utf-8" src="http://cdn.sencha.io/ext-4.0.7-gpl/ext-all.js"></script>-->
 
@@ -124,7 +132,7 @@
 		<div class="row-fluid footer">
 		   
 			 <p><i> 
-			     Copyright &copy; 2012 <?php echo $this->Html->link(__('Coders4Africa', true), 'http://www.coders4africa.org'); ?>, <?php echo $this->Html->link(__('Index Dot LLC', true), 'http://www.idxdot.net', array("shape"=>"rect")); ?>
+			     Copyright &copy; 2012 <?php echo $this->Html->link(__('Coders4Africa', true), 'http://www.coders4africa.org'); ?>
 		          </i>
 		       </p>
 		  <p><i>

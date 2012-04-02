@@ -16,5 +16,12 @@ class Country extends AppModel {
 				)	
 	);
 	
+	function afterFind($results) {
+		foreach ($results as $key => $val) {
+			//UTF8 encode the country name, otherwise nothing displays if there is an accent
+			$results[$key]['Country']['country'] = utf8_encode($val['Country']['country']);
+		}    return $results;
+	}
+	
 }
 ?>

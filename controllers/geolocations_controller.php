@@ -81,6 +81,7 @@ class GeolocationsController extends AppController
 			if($this->Geolocation->validates())
 			{
 				$geolocationData = $this->data['Geolocation'];
+				//debug($geolocationData);
 				if(empty($geolocationData['latitude']) && empty($geolocationData['longitude']))
 				{
 					$this->loadModel('Country');
@@ -160,7 +161,11 @@ class GeolocationsController extends AppController
 		$this->loadModel('Disaster');
 		$disasters = array();
 		//debug();
-		$country_name = $this->userGeolocation['Geolocation']['country_name'] ;
+		if(isset( $this->userGeolocation['Geolocation']['country_name']))
+		{
+			$country_name = $this->userGeolocation['Geolocation']['country_name'] ;
+		}
+		$country_name="";
 		//debug($country_name);
 		if($country_name == "USA")
 		{
@@ -182,27 +187,43 @@ class GeolocationsController extends AppController
 	{
 		$country_tld = $this->params['url']['country_tld'];
 		$this->loadModel('Country');
-		$cityList=  $this->Country->City->find('all', array(
-				'fields' => array('City.city_name', 'City.latitude', 'City.longitude'),
+		$cityCount=  $this->Country->City->find('count', array(
 				'conditions' => array(
 						'City.tld' =>$country_tld,
-						
+						"not"=>array("City.city_name"=>null)
+		
+				),
+				'recursive' => -1,
+				
+				
+					
+		));
+		$cityList=  $this->Country->City->find('all', array(
+				'fields' => array('DISTINCT(City.city_name) AS city_name', 'City.latitude', 'City.longitude'),
+				'conditions' => array(
+						'City.tld' =>$country_tld,
+						"not"=>array("City.city_name"=>null)
 						
 				),
 				'recursive' => -1,
+				'order' => array('City.city_name'),
+				'limit'=>20000
 			
 		));
 		$cities = array();
 		foreach ($cityList as $record)
 		{
 			$val = $record['City']['latitude'] . "_" . $record['City']['longitude'];
+			//debug($record);
 			if(!empty($record['City']['city_name']) && $record['City']['city_name'] != null)
 			{
-				$cities["{$val}"] = $record['City']['city_name'];
+				$cities["{$val}"] = utf8_encode($record['City']['city_name']);
 			}
 		}
 		//debug($cityList);
-		$this->set('cityList', $cities);
+		asort($cities, SORT_STRING);
+		$response = array("cities"=>$cities, "count"=>$cityCount);
+		$this->set('response', $response);
 	}
 	
 	function search_country()
@@ -215,16 +236,11 @@ class GeolocationsController extends AppController
 		$response = array();
 		$response = $this->Country->City->find('all',  array(
 								"conditions"=>array(
-										
 										"OR"=>array(
-												"City.city_name LIKE" => $term . "%",
-												
+												"City.city_name LIKE" => $term . "%",											
 										)
-								),
-								
-								"limit"=>10,
-								
-
+								),							
+								"limit"=>15,
 		));
 		
 		
@@ -258,11 +274,42 @@ class GeolocationsController extends AppController
 		
 	}
 	
+	protected function set_user_geolocation()
+	{
+		//if no user geoLocation retrieve it
+		if(Configure::read("environment") == "DEV")
+		{
+			//My local ip
+			$this->userIP = "173.66.97.113";
+		}
+		else
+		{
+			$this->userIP = $this->RequestHandler->getClientIP();
+		}
+		$conditions= array('ip' => $this->userIP);
+		$this->userGeolocation = $this->Geolocation->find('all', compact("conditions"));
+		$currentCity = $this->userGeolocation['Geolocation']['city'];
+		$this->loadModel('Country');
+		$this->Country->recursive=-1;
+		$tld = $this->userGeolocation['Geolocation']['country_iso3166'];
+		$locatedCountry = $this->Country->findByTld($tld);
+		$country_iso3 = $locatedCountry['Country']['iso3'];
+		$this->Session->write("country_iso", $country_iso3);
+	}
+	
 	protected function set_default_info()
 	{
 		//if no user geoLocation retrieve it
-		$this->userIP = "173.66.97.113";
-		//$this->userIP = $this->RequestHandler->getClientIP();
+		if(Configure::read("environment") == "DEV")
+		{
+			//My local ip
+			$this->userIP = "173.66.97.113";
+		}
+		else 
+		{
+			$this->userIP = $this->RequestHandler->getClientIP();
+		}
+		//
 		//debug($this->userIP);
 		$country_iso = "USA";
 		if(empty($this->userGeolocation))
@@ -270,20 +317,23 @@ class GeolocationsController extends AppController
 			$conditions= array('ip' => $this->userIP);
 			$this->userGeolocation = $this->Geolocation->find('all', compact("conditions"));
 			$currentCity = $this->userGeolocation['Geolocation']['city'];
-			$today = getdate();
-			$dailyTemperatures = array("");
-			for($startYear = 2000; $startYear>1900; $startYear = $startYear - 10)
-			{
-				$conditions = array("location"=>$currentCity, "date"=>$startYear .($today['mon'] >= 10)?$today['mon']:'0'. $today['mon'] . ($today['mday'] >= 10)?$today['mday']: "0".$today['mday']);
-				//array_push($dailyTemperatures, $this->Geolocation->find('all', compact("conditions")));
-			}
-			$this->set('dailyTemperatures', $dailyTemperatures );
+		
 			$this->loadModel('Country');
 			$this->Country->recursive=-1;
 			$tld = $this->userGeolocation['Geolocation']['country_iso3166'];
 			$locatedCountry = $this->Country->findByTld($tld);
 			$country_iso3 = $locatedCountry['Country']['iso3'];
 			$this->Session->write("country_iso", $country_iso3);
+			/*
+			 today = getdate();
+				$dailyTemperatures = array("");		
+			  for($startYear = 2000; $startYear>1900; $startYear = $startYear - 10)
+			 {
+			//$conditions = array("location"=>$currentCity, "date"=>$startYear .($today['mon'] >= 10)?$today['mon']:'0'. $today['mon'] . ($today['mday'] >= 10)?$today['mday']: "0".$today['mday']);
+			//array_push($dailyTemperatures, $this->Geolocation->find('all', compact("conditions")));
+			}
+			$this->set('dailyTemperatures', $dailyTemperatures );
+			*/
 		
 		}
 		$this->loadModel('TemperatureValue');
@@ -299,9 +349,10 @@ class GeolocationsController extends AppController
 		$this->loadModel('Country');
 		$countriesList = $this->Country->find('list', array(
 				'fields' => array('Country.tld', 'Country.country'),
-				'recursive' => 0
+				'recursive' => 0,
+				'order'=>'Country.country ASC'
 		));
-		
+		//debug($countriesList);
 		$app_data = array();
 		$this->set('user_geolocation', $this->userGeolocation);
 		$app_data['user_geolocation'] = $this->userGeolocation;

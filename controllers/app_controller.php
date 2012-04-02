@@ -32,7 +32,9 @@
  */
 class AppController extends Controller {
 	
-	var $components = array('Session','Email','RequestHandler' ,  'DebugKit.Toolbar');
+	var $components = array('Session','Email','RequestHandler' ,  
+			'DebugKit.Toolbar'
+	);
 	var $helpers = array('Html', 'Form', 'Session');
 	
 	function beforeFilter()

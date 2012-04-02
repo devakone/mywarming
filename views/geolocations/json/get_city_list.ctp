@@ -1,3 +1,3 @@
 <?php
-echo $this->Js->object($cityList);
+echo $this->Js->object($response);
 ?>
